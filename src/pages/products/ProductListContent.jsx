@@ -1,51 +1,62 @@
 import React, { useState, useEffect } from 'react';
 import ProductCard from './productCard/ProductCard';
 import SearchBar from '../../components/SearchBar';
-import products from '../products/list/products';
+import productService from '../../services/productService';
 
 const ProductListContent = ({ filteredProductsList, onAddToCart }) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const combinedProducts = React.useMemo(() => {
-    return [...products];
+  useEffect(() => {
+    // Llamamos a la API para obtener los productos
+    productService.getProducts()
+      .then((response) => {
+        // Si la estructura es { books: [...] }, extraemos los libros:
+        const data = response.data;
+        const booksArray = data.books || []; // En caso de que no exista books
+        setProducts(booksArray);
+        setFilteredProducts(booksArray);
+      })
+      .catch((error) => {
+        console.error('Error al obtener los productos:', error);
+        setError('No se pudieron cargar los productos.');
+      })
+      .finally(() => setLoading(false));
   }, []);
 
   useEffect(() => {
     if (searchTerm.trim() === '') {
-      setFilteredProducts(combinedProducts);
+      setFilteredProducts(products);
     } else {
-      const filtered = combinedProducts.filter((product) =>
+      const filtered = products.filter((product) =>
         product.title.toLowerCase().includes(searchTerm.toLowerCase())
       );
       setFilteredProducts(filtered);
     }
-  }, [searchTerm, combinedProducts]);
+  }, [searchTerm, products]);
 
   const handleSearch = (term) => {
     setSearchTerm(term);
   };
-  console.log(typeof onAddToCart);
+
+  if (loading) return <p>Cargando productos...</p>;
+  if (error) return <p>{error}</p>;
+
+  // Asegúrate de que filteredProductsList sea un arreglo antes de mapear
+  const listToRender = (Array.isArray(filteredProductsList) && filteredProductsList.length > 0)
+    ? filteredProductsList
+    : filteredProducts;
 
   return (
     <div>
       <SearchBar onSearch={handleSearch} />
       <div style={styles.container}>
-        {filteredProductsList.length > 0
-          ? filteredProductsList.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={onAddToCart}
-            />
-          ))
-          : filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onAddToCart={onAddToCart}
-            />
-          ))}
+        {listToRender.map((product) => (
+          <ProductCard key={product.id} product={product} onAddToCart={onAddToCart} />
+        ))}
       </div>
     </div>
   );

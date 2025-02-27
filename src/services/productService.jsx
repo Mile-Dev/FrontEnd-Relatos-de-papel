@@ -1,10 +1,11 @@
-import axios from 'axios';
+import axios from 'axios'
 
-const endPoint = 'http://localhost:8089';
+const endPoint = 'http://localhost:8087/api/books'
 
 const productService = {
-  getProducts: () => axios.get(`${endPoint}/products`), // Endpoint en el Gateway
-  getProductById: (id) => axios.get(`${endPoint}/products/${id}`),
-};
+  getProducts: () => axios.get(`${endPoint}`), // Listar libros
+  getProductById: (id) => axios.get(`${endPoint}/${id}`), // Obtener libro por ID
+  updateReviews: (id, updatedReviews) => axios.patch(`${endPoint}/${id}/reviews`, updatedReviews),
+}
 
-export default productService;
+export default productService
