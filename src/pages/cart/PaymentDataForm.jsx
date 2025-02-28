@@ -27,10 +27,10 @@ const PaymentDataForm = ({ paymentData, onChange }) => {
       <div className="mb-3">
         <label className="form-label">Fecha de Expiración:</label>
         <InputMask
-          mask="99/99"
+          mask="9999"
           value={paymentData.expiration}
           onChange={onChange}
-          placeholder="MM/AA"
+          placeholder="MMAA"
         >
           {(inputProps) => (
             <input

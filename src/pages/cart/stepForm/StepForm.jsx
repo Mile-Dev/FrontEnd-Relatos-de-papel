@@ -90,11 +90,7 @@ const StepForm = ({ cart, onIncrement, onDecrement, onRemove, setCart }) => {
         email: personalData.email,
         phone: personalData.phone,
       },
-      paymentData: {
-        cardNumber: `**** **** **** ${paymentData.cardNumber.slice(-4)}`,
-        expiration: paymentData.expiration,
-      },
-      cart: cart.map((item) => ({
+       cart: cart.map((item) => ({
         id: item.id,
         title: item.title,
         quantity: item.quantity,
