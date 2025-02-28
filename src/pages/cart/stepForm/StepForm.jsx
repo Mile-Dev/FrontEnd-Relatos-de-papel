@@ -13,6 +13,8 @@ import PersonalDataForm from "../PersonalDataForm";
 import PaymentDataForm from "../PaymentDataForm";
 import Cart from "../../../components/Cart";
 import "./StepForm.css";
+import paymentService from '../../../services/paymentService'
+
 
 const StepIcon = (props: StepIconProps) => {
   const { active, completed, icon } = props;
@@ -81,7 +83,49 @@ const StepForm = ({ cart, onIncrement, onDecrement, onRemove, setCart }) => {
     setActiveStep((prev) => prev - 1);
   };
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
+    const orderData = {
+      personalData: {
+        name: personalData.name,
+        email: personalData.email,
+        phone: personalData.phone,
+      },
+      paymentData: {
+        cardNumber: `**** **** **** ${paymentData.cardNumber.slice(-4)}`,
+        expiration: paymentData.expiration,
+      },
+      cart: cart.map((item) => ({
+        id: item.id,
+        title: item.title,
+        quantity: item.quantity,
+        price: item.price.toFixed(2),
+        subtotal: (item.price * item.quantity).toFixed(2),
+      })),
+      total: calculateTotal(),
+    };
+    try {
+      console.log("Enviando datos de pago al backend...", orderData);
+      await paymentService.createPayment(orderData);
+
+      Swal.fire({
+        icon: "success",
+        title: "¡Pago realizado con éxito!",
+        text: "Gracias por tu compra. Te enviaremos los detalles por correo.",
+      }).then(() => {
+        setCart([]); // Vaciar el carrito
+        navigate("/books"); // Redirigir a la página de libros
+      });
+
+    } catch (error) {
+      console.error("Error al procesar el pago:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error en el pago",
+        text: "Hubo un problema al procesar tu pago. Intenta nuevamente.",
+      });
+    }
+    console.log("Order Data:", JSON.stringify(orderData, null, 2)); // Mostrar JSON en consola
+
     Swal.fire({
       icon: "success",
       title: "¡Pago realizado con éxito!",
@@ -91,6 +135,7 @@ const StepForm = ({ cart, onIncrement, onDecrement, onRemove, setCart }) => {
       navigate("/books");
     });
   };
+
 
   const calculateTotal = () => {
     return cart.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);

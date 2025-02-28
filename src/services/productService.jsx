@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const endPoint = 'http://localhost:8087/api/books'
+const endPoint = 'https://apirelatosdepapel.ingenius-soft.com/api/books'
 
 const productService = {
   getProducts: () => axios.get(`${endPoint}`), // Listar libros
