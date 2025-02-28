@@ -10,7 +10,7 @@ const Cart = ({ cart, onIncrement, onDecrement, onRemove }) => {
   }
 
   const navigate = useNavigate()
-  const location = useLocation() // Hook para obtener la ruta actual
+  const location = useLocation()
 
   return (
     <div className="cart">

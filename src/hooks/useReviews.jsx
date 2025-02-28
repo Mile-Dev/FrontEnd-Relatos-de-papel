@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 const useReviews = (initialReviews = []) => {
   const [reviews, setReviews] = useState(initialReviews);
 
-  // Agrega este useEffect para sincronizar los cambios en initialReviews
+
   useEffect(() => {
     setReviews(initialReviews);
   }, [initialReviews]);

@@ -8,12 +8,10 @@ import { useNavigate } from 'react-router-dom'
 const ProductCard = ({ product, onAddToCart }) => {
   const navigate = useNavigate()
 
-  // Si no hay producto, no renderizamos nada
   if (!product) {
     return null
   }
 
-  // Agregar producto al carrito
   const handleAddToCart = () => {
     if (onAddToCart) {
       onAddToCart(product)
@@ -27,15 +25,12 @@ const ProductCard = ({ product, onAddToCart }) => {
     }
   }
 
-  // Navegar a la vista de detalles
   const handleViewDetails = () => {
     navigate(`/book/${product.id}`)
   }
 
-  // Verificamos si existe descuento
   const hasDiscount = product.discount && product.discount > 0
 
-  // Calculamos el precio final
   const discountedPrice = hasDiscount
     ? (product.price - (product.price * product.discount) / 100).toFixed(2)
     : product.price

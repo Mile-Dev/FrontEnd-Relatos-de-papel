@@ -11,12 +11,10 @@ const ProductListContent = ({ filteredProductsList, onAddToCart }) => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Llamamos a la API para obtener los productos
     productService.getProducts()
       .then((response) => {
-        // Si la estructura es { books: [...] }, extraemos los libros:
         const data = response.data;
-        const booksArray = data.books || []; // En caso de que no exista books
+        const booksArray = data.books || [];
         setProducts(booksArray);
         setFilteredProducts(booksArray);
       })
@@ -45,7 +43,6 @@ const ProductListContent = ({ filteredProductsList, onAddToCart }) => {
   if (loading) return <p>Cargando productos...</p>;
   if (error) return <p>{error}</p>;
 
-  // Asegúrate de que filteredProductsList sea un arreglo antes de mapear
   const listToRender = (Array.isArray(filteredProductsList) && filteredProductsList.length > 0)
     ? filteredProductsList
     : filteredProducts;

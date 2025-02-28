@@ -5,36 +5,34 @@ import Swal from "sweetalert2";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar, faThumbsDown, faThumbsUp } from "@fortawesome/free-solid-svg-icons";
 
-// Hook para manejar reseñas
+
 import useReviews from "../../hooks/useReviews";
-// Servicio para consultar la API
+
 import productService from "../../services/productService";
 
 const BookDetail = ({ onAddToCart }) => {
   const { id } = useParams();
 
-  // Estados locales
+
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Base de reseñas, que viene desde la API
   const [baseReviews, setBaseReviews] = useState([]);
 
-  // El hook maneja la lógica de reseñas, partiendo de baseReviews
   const {
-    reviews,            // Estado interno (las reseñas que renderizamos)
+    reviews,
     addReview: addReviewLocal,
     likeReview: likeReviewLocal,
     dislikeReview: dislikeReviewLocal,
     calculateAverageRating,
   } = useReviews(baseReviews);
 
-  // Estados para el nuevo comentario
+
   const [newComment, setNewComment] = useState("");
   const [rating, setRating] = useState(0);
 
-  // 1. Cargar el producto y sus reseñas desde la API
+
   useEffect(() => {
     productService
       .getProductById(id)
@@ -69,16 +67,13 @@ const BookDetail = ({ onAddToCart }) => {
     }
   };
 
-  // 3. Función para dar "like"
   const handleLike = (reviewIndex) => {
-    // Clonar el array de reseñas y modificar la reseña correspondiente
     const updatedReviews = reviews.map((review, index) => {
       if (index === reviewIndex) {
         return {
           ...review,
           likes: review.userLiked ? review.likes - 1 : review.likes + 1,
           userLiked: !review.userLiked,
-          // Si antes le había dado dislike, se revierte
           dislikes: review.userDisliked ? review.dislikes - 1 : review.dislikes,
           userDisliked: false,
         };
@@ -86,23 +81,18 @@ const BookDetail = ({ onAddToCart }) => {
       return review;
     });
 
-    // Actualizar estado con el nuevo array
     likeReviewLocal(reviewIndex);
 
-    // Enviar al backend la lista de reseñas actualizada
     persistReviews(updatedReviews);
   };
 
-  // 4. Función para dar "dislike"
   const handleDislike = (reviewIndex) => {
-    // Clonar el array de reseñas y modificar la reseña correspondiente
     const updatedReviews = reviews.map((review, index) => {
       if (index === reviewIndex) {
         return {
           ...review,
           dislikes: review.userDisliked ? review.dislikes - 1 : review.dislikes + 1,
           userDisliked: !review.userDisliked,
-          // Si antes le había dado like, se revierte
           likes: review.userLiked ? review.likes - 1 : review.likes,
           userLiked: false,
         };
@@ -110,14 +100,11 @@ const BookDetail = ({ onAddToCart }) => {
       return review;
     });
 
-    // Actualizar estado con el nuevo array
     dislikeReviewLocal(reviewIndex);
 
-    // Enviar al backend la lista de reseñas actualizada
     persistReviews(updatedReviews);
   };
 
-  // 5. Función para agregar un nuevo comentario
   const handleAddReview = () => {
     if (!newComment.trim() || rating === 0) {
       Swal.fire({
@@ -128,7 +115,6 @@ const BookDetail = ({ onAddToCart }) => {
       return;
     }
 
-    // Crear el nuevo comentario
     const newReview = {
       comment: newComment,
       rating,
@@ -138,16 +124,12 @@ const BookDetail = ({ onAddToCart }) => {
       userDisliked: false,
     };
 
-    // Mezclar la nueva reseña con las existentes
     const updatedReviews = [...reviews, newReview];
 
-    // Actualizar el estado local antes de persistir
     addReviewLocal(newComment, rating);
 
-    // Enviar al backend la lista actualizada
     persistReviews(updatedReviews);
 
-    // Reiniciar los campos del formulario
     setNewComment("");
     setRating(0);
 
@@ -161,7 +143,6 @@ const BookDetail = ({ onAddToCart }) => {
   };
 
 
-  // Función para mostrar las estrellas (rating)
   const renderStars = (average) => {
     const fullStars = Math.floor(average);
     const halfStar = average % 1 >= 0.5;
@@ -176,7 +157,6 @@ const BookDetail = ({ onAddToCart }) => {
     );
   };
 
-  // 6. Manejar el carrito
   const handleAddToCart = () => {
     if (onAddToCart) {
       onAddToCart(product);
@@ -190,7 +170,6 @@ const BookDetail = ({ onAddToCart }) => {
     }
   };
 
-  // 7. Render principal
   if (loading) {
     return <div>Cargando...</div>;
   }

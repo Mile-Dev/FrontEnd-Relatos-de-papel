@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import useCart from "./hooks/useCart";
 import LandingPage from "./pages/landing/LandingPage";
@@ -8,16 +8,33 @@ import ProductListContent from "./components/ProductList";
 import Categories from "./components/Categories";
 import Cart from "./components/Cart";
 import StepForm from "./pages/cart/stepForm/StepForm";
-import products from "./pages/products/list/products";
+import productService from "./services/productService";
 import MinimalLayout from "./layout/minimalLayout/MinimalLayout";
 import MainLayout from "./layout/MainLayout";
 
 function App() {
   const { cart, addToCart, incrementQuantity, decrementQuantity, removeFromCart, setCart } = useCart();
-  const [filteredProductsList, setFilteredProductsList] = useState(products);
+  const [products, setProducts] = useState([]);
+  const [filteredProductsList, setFilteredProductsList] = useState([]);
+
+
+  useEffect(() => {
+    productService.getProducts()
+      .then(response => {
+        if (Array.isArray(response.data)) {
+          setProducts(response.data);
+          setFilteredProductsList(response.data);
+        } else {
+          console.error("Error: la API no devolvió un array", response.data);
+        }
+      })
+      .catch(error => console.error("Error al obtener los productos:", error));
+  }, []);
+
 
   const handleCategoryFilter = useCallback(
     (selectedCategories, selectedSubcategories) => {
+      if (!Array.isArray(products)) return;
       const filtered = products.filter((product) => {
         const categoryMatch = selectedCategories.includes(product.category);
         const subcategoryMatch = selectedSubcategories.includes(product.subcategory);
@@ -25,7 +42,7 @@ function App() {
       });
       setFilteredProductsList(filtered);
     },
-    []
+    [products]
   );
 
   return (
@@ -91,7 +108,7 @@ function App() {
           path="/book/:id"
           element={
             <MainLayout cart={cart}>
-              <BookDetail products={products} onAddToCart={addToCart} />
+              <BookDetail onAddToCart={addToCart} />
             </MainLayout>
           }
         />

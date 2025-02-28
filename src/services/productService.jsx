@@ -4,8 +4,8 @@ const endPoint = 'https://apirelatosdepapel.ingenius-soft.com/api/books'
 // const endPoint = 'http://localhost:8087/api/books'
 
 const productService = {
-  getProducts: () => axios.get(`${endPoint}`), // Listar libros
-  getProductById: (id) => axios.get(`${endPoint}/${id}`), // Obtener libro por ID
+  getProducts: () => axios.get(`${endPoint}`),
+  getProductById: (id) => axios.get(`${endPoint}/${id}`),
   updateReviews: (id, updatedReviews) => axios.patch(`${endPoint}/${id}/reviews`, updatedReviews),
 }
 

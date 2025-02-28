@@ -108,8 +108,8 @@ const StepForm = ({ cart, onIncrement, onDecrement, onRemove, setCart }) => {
         title: "¡Pago realizado con éxito!",
         text: "Gracias por tu compra. Te enviaremos los detalles por correo.",
       }).then(() => {
-        setCart([]); // Vaciar el carrito
-        navigate("/books"); // Redirigir a la página de libros
+        setCart([]);
+        navigate("/books");
       });
 
     } catch (error) {
@@ -120,7 +120,7 @@ const StepForm = ({ cart, onIncrement, onDecrement, onRemove, setCart }) => {
         text: "Hubo un problema al procesar tu pago. Intenta nuevamente.",
       });
     }
-    console.log("Order Data:", JSON.stringify(orderData, null, 2)); // Mostrar JSON en consola
+    console.log("Order Data:", JSON.stringify(orderData, null, 2));
 
     Swal.fire({
       icon: "success",
