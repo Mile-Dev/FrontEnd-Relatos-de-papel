@@ -1,4 +1,3 @@
-import "./App.css";
 import React, { useCallback, useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import useCart from "./hooks/useCart";
@@ -16,34 +15,74 @@ function App() {
   const { cart, addToCart, incrementQuantity, decrementQuantity, removeFromCart, setCart } = useCart();
   const [products, setProducts] = useState([]);
   const [filteredProductsList, setFilteredProductsList] = useState([]);
-
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedSubcategories, setSelectedSubcategories] = useState([]);
 
   useEffect(() => {
     productService.getProducts()
       .then(response => {
-        if (Array.isArray(response.data)) {
-          setProducts(response.data);
-          setFilteredProductsList(response.data);
+        if (response.data && Array.isArray(response.data.books)) {
+          setProducts(response.data.books);
+          setFilteredProductsList(response.data.books);
         } else {
-          console.error("Error: la API no devolvió un array", response.data);
+          console.error("Error: la API no devolvió un array de libros", response.data);
         }
       })
       .catch(error => console.error("Error al obtener los productos:", error));
   }, []);
 
-
   const handleCategoryFilter = useCallback(
-    (selectedCategories, selectedSubcategories) => {
-      if (!Array.isArray(products)) return;
-      const filtered = products.filter((product) => {
-        const categoryMatch = selectedCategories.includes(product.category);
-        const subcategoryMatch = selectedSubcategories.includes(product.subcategory);
-        return categoryMatch || subcategoryMatch;
-      });
+    (categories, subcategories) => {
+      setSelectedCategories(categories);
+      setSelectedSubcategories(subcategories);
+
+      if (!Array.isArray(products) || products.length === 0) return;
+
+      let filtered = [...products];
+
+      if (searchTerm) {
+        filtered = filtered.filter((product) =>
+          product.title.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      }
+
+      if (categories.length > 0 || subcategories.length > 0) {
+        filtered = filtered.filter((product) => {
+          const categoryMatch = categories.length === 0 || categories.includes(product.category);
+          const subcategoryMatch = subcategories.length === 0 || subcategories.includes(product.subcategory);
+          return categoryMatch && subcategoryMatch;
+        });
+      }
+
       setFilteredProductsList(filtered);
     },
-    [products]
+    [products, searchTerm]
   );
+
+
+  const handleSearchFilter = async (term) => {
+    const sanitizedTerm = typeof term === "string" ? term.trim() : "";
+    setSearchTerm(sanitizedTerm);
+
+    if (sanitizedTerm === "") {
+      setFilteredProductsList(products);
+      return;
+    }
+
+    try {
+      const response = await productService.getProductsParams(sanitizedTerm);
+
+      if (response.data && Array.isArray(response.data.books)) {
+        setFilteredProductsList(response.data.books);
+      } else {
+        setFilteredProductsList([]);
+      }
+    } catch (error) {
+      console.error("Error al buscar productos:", error);
+      setFilteredProductsList([]);
+    }
+  };
 
   return (
     <Router>
@@ -70,6 +109,7 @@ function App() {
                 <div className="col-10">
                   <ProductListContent
                     filteredProductsList={filteredProductsList}
+                    onSearch={handleSearchFilter}
                     onAddToCart={addToCart}
                   />
                 </div>

@@ -7,6 +7,8 @@ const productService = {
   getProducts: () => axios.get(`${endPoint}`),
   getProductById: (id) => axios.get(`${endPoint}/${id}`),
   updateReviews: (id, updatedReviews) => axios.patch(`${endPoint}/${id}/reviews`, updatedReviews),
+  getProductsParams: (search) => axios.get(`${endPoint}?search=${search}`)
+
 }
 
 export default productService

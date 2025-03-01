@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import '../App.css';
 
-const SearchBar = ({ onSearch }) => {
+const SearchBar = ({ onSearch = () => {} }) => {
   const [inputValue, setInputValue] = useState('');
 
-  const handleInputChange = (e) => {
-    const term = e.target.value;
-    setInputValue(term);
-    onSearch(term);
+  const handleSearchClick = () => {
+    console.log("🔍 Ejecutando búsqueda para:", inputValue);
+    onSearch(inputValue); // Se asegura de que onSearch sea una función
   };
 
   return (
@@ -16,12 +15,12 @@ const SearchBar = ({ onSearch }) => {
         type="text"
         placeholder="Buscar libros..."
         value={inputValue}
-        onChange={handleInputChange}
+        onChange={(e) => setInputValue(e.target.value)}
         className="search-bar__input"
       />
       <button
         className="search-bar__button"
-        onClick={() => onSearch(inputValue)}
+        onClick={handleSearchClick}
       >
         Buscar
       </button>
